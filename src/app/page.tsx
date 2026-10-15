@@ -1,4 +1,7 @@
-import { OrderForm } from "@/components/OrderForm";
+import { LandingHeader } from "@/components/LandingHeader";
+import { OrderCtaButton } from "@/components/OrderCtaButton";
+import { RoastingCarousel } from "@/components/RoastingCarousel";
+import { SiteProviders } from "@/components/SiteProviders";
 import {
   coffeeOrigins,
   company,
@@ -14,23 +17,10 @@ function formatPrice(amount: number): string {
 
 export default function Home() {
   return (
-    <>
-      <header className="border-b border-coffee/10 bg-cream/95 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
-          <a href="#" className="font-serif text-2xl tracking-tight text-coffee">
-            Кварта
-          </a>
-          <a
-            href="#order"
-            className="rounded-lg bg-coffee px-4 py-2 text-sm font-medium text-cream transition-colors hover:bg-coffee/90"
-          >
-            Заказать
-          </a>
-        </div>
-      </header>
+    <SiteProviders>
+      <LandingHeader />
 
       <main>
-        {/* Hero */}
         <section className="border-b border-coffee/10 bg-cream px-4 py-16 sm:px-6 sm:py-24">
           <div className="mx-auto max-w-5xl">
             <p className="text-sm font-medium uppercase tracking-widest text-olive">
@@ -44,16 +34,16 @@ export default function Home() {
               Закажите пачку или подписку — доставим в пятницу или заберите на
               ул.&nbsp;Короля.
             </p>
-            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <a
-                href="#order"
-                className="inline-flex items-center justify-center rounded-lg bg-terracotta px-6 py-3 text-sm font-semibold text-cream transition-colors hover:bg-terracotta-dark"
-              >
-                Оставить заявку
-              </a>
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+              <OrderCtaButton interest="one-time">
+                Заказать кофе
+              </OrderCtaButton>
+              <OrderCtaButton interest="subscription" variant="secondary">
+                Оформить подписку
+              </OrderCtaButton>
               <a
                 href="#assortment"
-                className="inline-flex items-center justify-center rounded-lg border border-coffee/20 px-6 py-3 text-sm font-medium text-coffee transition-colors hover:border-coffee/40 hover:bg-coffee/5"
+                className="inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium text-coffee/80 underline-offset-4 transition-colors hover:text-coffee hover:underline"
               >
                 Смотреть ассортимент
               </a>
@@ -61,7 +51,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* About */}
+        <RoastingCarousel />
+
         <section
           id="about"
           className="border-b border-coffee/10 bg-white px-4 py-16 sm:px-6 sm:py-20"
@@ -96,7 +87,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Assortment */}
         <section
           id="assortment"
           className="border-b border-coffee/10 bg-cream px-4 py-16 sm:px-6 sm:py-20"
@@ -126,46 +116,68 @@ export default function Home() {
                   <p className="mt-1 text-lg font-semibold text-coffee">
                     {formatPrice(item.priceByn)}
                   </p>
+                  <OrderCtaButton
+                    interest="one-time"
+                    comment={`Хочу: ${item.name}, ${item.weightGrams} г`}
+                    variant="ghost"
+                    className="mt-4 w-full px-4 py-2.5 text-sm"
+                  >
+                    Заказать
+                  </OrderCtaButton>
                 </li>
               ))}
             </ul>
 
             <div className="mt-6 grid gap-6 sm:grid-cols-2">
-              <article className="rounded-2xl border border-olive/25 bg-white p-6 shadow-sm">
+              <article className="flex flex-col rounded-2xl border border-olive/25 bg-white p-6 shadow-sm">
                 <span className="text-xs font-medium uppercase tracking-wide text-olive">
                   Дрип-пакеты
                 </span>
                 <h3 className="mt-2 font-serif text-xl text-coffee">
                   {dripPack.name}
                 </h3>
-                <p className="mt-2 text-sm text-coffee/75">
+                <p className="mt-2 flex-1 text-sm text-coffee/75">
                   {dripPack.quantity} штук — удобно попробовать разные профили
                 </p>
                 <p className="mt-4 text-lg font-semibold text-coffee">
                   {formatPrice(dripPack.priceByn)}
                 </p>
+                <OrderCtaButton
+                  interest="one-time"
+                  comment={`Дрип-пакеты: ${dripPack.name}, ${dripPack.quantity} шт.`}
+                  variant="secondary"
+                  className="mt-4 w-full"
+                >
+                  Заказать
+                </OrderCtaButton>
               </article>
 
-              <article className="rounded-2xl border-2 border-terracotta/40 bg-white p-6 shadow-sm">
+              <article className="flex flex-col rounded-2xl border-2 border-terracotta/40 bg-white p-6 shadow-sm">
                 <span className="text-xs font-medium uppercase tracking-wide text-terracotta">
                   Подписка
                 </span>
                 <h3 className="mt-2 font-serif text-xl text-coffee">
                   Кофе каждый месяц
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed text-coffee/75">
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-coffee/75">
                   {subscription.description}
                 </p>
                 <p className="mt-4 text-lg font-semibold text-coffee">
                   {formatPrice(subscription.priceBynPerMonth)}{" "}
                   <span className="text-sm font-normal text-coffee/60">/ мес</span>
                 </p>
+                <OrderCtaButton
+                  interest="subscription"
+                  variant="primary"
+                  className="mt-4 w-full"
+                >
+                  Оформить подписку
+                </OrderCtaButton>
               </article>
             </div>
           </div>
         </section>
 
-        {/* Delivery */}
         <section
           id="delivery"
           className="border-b border-coffee/10 bg-white px-4 py-16 sm:px-6 sm:py-20"
@@ -201,9 +213,7 @@ export default function Home() {
               </div>
               <div className="rounded-2xl bg-cream p-6 sm:p-8">
                 <h3 className="font-serif text-xl text-coffee">Самовывоз</h3>
-                <p className="mt-4 text-coffee/85">
-                  {pickup.fullAddress}
-                </p>
+                <p className="mt-4 text-coffee/85">{pickup.fullAddress}</p>
                 <p className="mt-3 text-sm text-coffee/70">
                   {pickup.hoursWeekdays}, {pickup.hoursWeekend}
                 </p>
@@ -212,20 +222,6 @@ export default function Home() {
                   заявке.
                 </p>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Order form */}
-        <section id="order" className="bg-cream px-4 py-16 sm:px-6 sm:py-20">
-          <div className="mx-auto max-w-lg">
-            <h2 className="font-serif text-3xl text-coffee">Заявка на заказ</h2>
-            <p className="mt-3 text-coffee/75">
-              Оставьте контакты — перезвоним, уточним детали и соберём заказ к
-              ближайшей пятнице.
-            </p>
-            <div className="mt-8">
-              <OrderForm />
             </div>
           </div>
         </section>
@@ -245,12 +241,12 @@ export default function Home() {
               <p className="mt-2">{pickup.hoursWeekdays}</p>
               <p>{pickup.hoursWeekend}</p>
               <p className="mt-4">
-                <a
-                  href="#order"
-                  className="underline-offset-4 hover:underline"
+                <OrderCtaButton
+                  variant="ghost"
+                  className="px-0 py-0 text-sm font-normal text-cream underline-offset-4 hover:underline"
                 >
                   Оставить заявку
-                </a>
+                </OrderCtaButton>
               </p>
             </div>
           </div>
@@ -259,6 +255,6 @@ export default function Home() {
           </p>
         </div>
       </footer>
-    </>
+    </SiteProviders>
   );
 }

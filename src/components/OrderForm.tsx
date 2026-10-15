@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { orderInterestOptions, type OrderInterest } from "@/data/coffee";
+import { useToast } from "@/components/ToastProvider";
 
 type FormState = {
   name: string;
@@ -19,12 +20,21 @@ type LeadUtmPayload = {
   referrer?: string;
 };
 
-const initialForm: FormState = {
+export type OrderFormProps = {
+  defaultInterest?: OrderInterest;
+  defaultComment?: string;
+  onSuccess?: () => void;
+  variant?: "modal" | "default";
+};
+
+const initialForm = (
+  defaults?: Pick<OrderFormProps, "defaultInterest" | "defaultComment">,
+): FormState => ({
   name: "",
   phone: "",
-  interest: "",
-  comment: "",
-};
+  interest: defaults?.defaultInterest ?? "",
+  comment: defaults?.defaultComment ?? "",
+});
 
 const interestToApiType: Record<OrderInterest, "subscription" | "order" | "question"> = {
   subscription: "subscription",
@@ -65,14 +75,25 @@ function collectUtmFromLocation(): LeadUtmPayload | undefined {
   return Object.keys(utm).length > 0 ? utm : undefined;
 }
 
-export function OrderForm() {
-  const [form, setForm] = useState<FormState>(initialForm);
+export function OrderForm({
+  defaultInterest,
+  defaultComment = "",
+  onSuccess,
+  variant = "default",
+}: OrderFormProps) {
+  const { showToast } = useToast();
+  const [form, setForm] = useState<FormState>(() =>
+    initialForm({ defaultInterest, defaultComment }),
+  );
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>(
     {},
   );
-  const [formError, setFormError] = useState<string | null>(null);
-  const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const formShell =
+    variant === "modal"
+      ? "space-y-5"
+      : "space-y-5 rounded-2xl border border-coffee/10 bg-white p-6 shadow-sm sm:p-8";
 
   function validate(): boolean {
     const next: Partial<Record<keyof FormState, string>> = {};
@@ -86,12 +107,19 @@ export function OrderForm() {
       next.interest = "Выберите, что вас интересует";
     }
     setErrors(next);
+
+    if (Object.keys(next).length > 0) {
+      const first = next.name ?? next.phone ?? next.interest;
+      if (first) {
+        showToast("error", first);
+      }
+    }
+
     return Object.keys(next).length === 0;
   }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setFormError(null);
     if (!validate() || !form.interest) {
       return;
     }
@@ -113,59 +141,33 @@ export function OrderForm() {
       const data = (await response.json()) as { error?: string; message?: string };
 
       if (!response.ok) {
-        setFormError(
+        showToast(
+          "error",
           data.error ??
             "Не удалось отправить заявку. Попробуйте позже или позвоните нам.",
         );
         return;
       }
 
-      setSubmitted(true);
-      setForm(initialForm);
+      showToast(
+        "success",
+        "Заявка успешно отправлена! Менеджер свяжется с вами.",
+      );
+      setForm(initialForm({ defaultInterest, defaultComment }));
       setErrors({});
+      onSuccess?.();
     } catch {
-      setFormError("Нет связи с сервером. Проверьте интернет и попробуйте снова.");
+      showToast(
+        "error",
+        "Нет связи с сервером. Проверьте интернет и попробуйте снова.",
+      );
     } finally {
       setIsSubmitting(false);
     }
   }
 
-  if (submitted) {
-    return (
-      <div
-        className="rounded-2xl border border-olive/30 bg-cream p-8 text-center"
-        role="status"
-      >
-        <p className="font-serif text-xl text-coffee">Спасибо за заявку</p>
-        <p className="mt-2 text-coffee/75">
-          Мы свяжемся с вами в ближайшее время по указанному телефону.
-        </p>
-        <button
-          type="button"
-          onClick={() => setSubmitted(false)}
-          className="mt-6 text-sm font-medium text-terracotta underline-offset-4 hover:underline"
-        >
-          Отправить ещё одну заявку
-        </button>
-      </div>
-    );
-  }
-
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-5 rounded-2xl border border-coffee/10 bg-white p-6 shadow-sm sm:p-8"
-      noValidate
-    >
-      {formError ? (
-        <p
-          className="rounded-lg border border-terracotta/30 bg-terracotta/10 px-4 py-3 text-sm text-coffee"
-          role="alert"
-        >
-          {formError}
-        </p>
-      ) : null}
-
+    <form onSubmit={handleSubmit} className={formShell} noValidate>
       <div>
         <label htmlFor="order-name" className="block text-sm font-medium text-coffee">
           Имя
@@ -177,7 +179,7 @@ export function OrderForm() {
           autoComplete="name"
           value={form.name}
           onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-          className="mt-1.5 w-full rounded-lg border border-coffee/15 bg-cream px-4 py-2.5 text-coffee outline-none ring-terracotta/40 placeholder:text-coffee/40 focus:border-terracotta focus:ring-2"
+          className="mt-1.5 w-full rounded-lg border border-coffee/15 bg-white px-4 py-2.5 text-coffee outline-none ring-terracotta/40 placeholder:text-coffee/40 focus:border-terracotta focus:ring-2"
           placeholder="Как к вам обращаться"
         />
         {errors.name ? (
@@ -198,7 +200,7 @@ export function OrderForm() {
           onChange={(e) =>
             setForm((f) => ({ ...f, phone: normalizePhone(e.target.value) }))
           }
-          className="mt-1.5 w-full rounded-lg border border-coffee/15 bg-cream px-4 py-2.5 text-coffee outline-none ring-terracotta/40 placeholder:text-coffee/40 focus:border-terracotta focus:ring-2"
+          className="mt-1.5 w-full rounded-lg border border-coffee/15 bg-white px-4 py-2.5 text-coffee outline-none ring-terracotta/40 placeholder:text-coffee/40 focus:border-terracotta focus:ring-2"
           placeholder="+375 29 XXX-XX-XX"
         />
         {errors.phone ? (
@@ -245,7 +247,7 @@ export function OrderForm() {
           rows={4}
           value={form.comment}
           onChange={(e) => setForm((f) => ({ ...f, comment: e.target.value }))}
-          className="mt-1.5 w-full resize-y rounded-lg border border-coffee/15 bg-cream px-4 py-2.5 text-coffee outline-none ring-terracotta/40 placeholder:text-coffee/40 focus:border-terracotta focus:ring-2"
+          className="mt-1.5 w-full resize-y rounded-lg border border-coffee/15 bg-white px-4 py-2.5 text-coffee outline-none ring-terracotta/40 placeholder:text-coffee/40 focus:border-terracotta focus:ring-2"
           placeholder="Сорта, количество, удобное время звонка"
         />
       </div>
