@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
+##Запуск 
+``` bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+###Создание базы
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+По существующим требованиям с помощью Gemini был создан стартовый запрос
+Мы создаем лендинг для небольшой ремесленной обжарки кофе «Кварта» в Минске. 
+Стек: Next.js (App Router), TypeScript, Tailwind CSS.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Требования к стилю и дизайну:
+- Тёплый, простой, крафтовый тон (без пафоса, без глянцевых фиолетовых неоновых градиентов).
+- Цветовая палитра: глубокий кофейный/шоколадный (#2C1810 или около того), тёплый молочный/кремовый фон (#F9F6F0), акценты терракотовые или приглушенно-оливковые.
+- Типографика: чистая, сбалансированная.
 
-## Learn More
+Создай следующие структуры и файлы:
+1. Файл констант `src/data/coffee.ts` со следующими данными из ТЗ:
+   - Сорта зерна: 
+     * Эфиопия Иргачефф (цветочный, бергамот, светлая обжарка · 250 г — 32 BYN)
+     * Колумбия Уила (карамель, красное яблоко · 250 г — 29 BYN)
+     * Бразилия Серрадо (орех, шоколад, под эспрессо · 250 г — 26 BYN)
+   - Дрип-пакеты: Ассорти, 10 штук — 18 BYN
+   - Подписка: 2 пачки по 250 г раз в месяц, доставка бесплатно — 54 BYN / мес
+   - Информация о компании: основатели Аня и Дмитрий (бывшие бариста), обжаривают партиями по 5 кг с 2019 года, обжарка по четвергам, развоз по пятницам. Зерно на 1–3 день после обжарки.
+   - Адрес: Минск, ул. Короля, 9 (самовывоз). Время: пн–пт 8:00–20:00, сб–вс 10:00–18:00.
 
-To learn more about Next.js, take a look at the following resources:
+2. Сделай базовую верстку главной страницы (`src/app/page.tsx`) со следующими секциями:
+   - Hero-секция (заголовок про свежесть, обжарку по четвергам, призыв к заказу).
+   - Блок «Кто мы и почему свежесть важна» (история Ани и Дмитрия, ул. Короля 9).
+   - Блок «Ассортимент и подписка» (карточки товаров из констант).
+   - Блок «Доставка и самовывоз» (условия: пятница, от 50 BYN бесплатно, самовывоз с Короля).
+   - Секция с формой заявки (поля: Имя, Телефон, Что интересует: подписка / разовый заказ / вопрос, Комментарий).
+   - Футер с контактами.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Напиши чистый, рабочий код без заглушек.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+###Базовая страница 
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Базовая страница получилась стандартной, позже будет отправлена на доработку, пока что нормально, следующим шагом будет написание бека
