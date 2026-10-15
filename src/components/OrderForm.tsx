@@ -75,6 +75,14 @@ function collectUtmFromLocation(): LeadUtmPayload | undefined {
   return Object.keys(utm).length > 0 ? utm : undefined;
 }
 
+/* Общие стили: крупнее на телефоне, компактнее с sm (640px) */
+const labelClass = "block text-[15px] font-semibold text-coffee";
+const fieldBase =
+  "mt-1.5 w-full rounded-lg border bg-white px-3.5 py-3 text-base text-coffee outline-none transition-colors placeholder:text-coffee-soft/60 focus:ring-2 focus:ring-terracotta/25 sm:py-2.5";
+const fieldOk = "border-coffee/25 hover:border-coffee/45 focus:border-terracotta";
+const fieldError = "border-terracotta focus:border-terracotta";
+const errorClass = "mt-1.5 text-sm font-medium text-terracotta-dark";
+
 export function OrderForm({
   defaultInterest,
   defaultComment = "",
@@ -92,8 +100,8 @@ export function OrderForm({
 
   const formShell =
     variant === "modal"
-      ? "space-y-5"
-      : "space-y-5 rounded-2xl border border-coffee/10 bg-white p-6 shadow-sm sm:p-8";
+      ? "space-y-4 sm:space-y-5"
+      : "space-y-4 rounded-2xl border border-coffee/15 bg-white p-6 shadow-sm sm:space-y-5 sm:p-8";
 
   function validate(): boolean {
     const next: Partial<Record<keyof FormState, string>> = {};
@@ -168,55 +176,68 @@ export function OrderForm({
 
   return (
     <form onSubmit={handleSubmit} className={formShell} noValidate>
-      <div>
-        <label htmlFor="order-name" className="block text-sm font-medium text-coffee">
-          Имя
-        </label>
-        <input
-          id="order-name"
-          name="name"
-          type="text"
-          autoComplete="name"
-          value={form.name}
-          onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-          className="mt-1.5 w-full rounded-lg border border-coffee/15 bg-white px-4 py-2.5 text-coffee outline-none ring-terracotta/40 placeholder:text-coffee/40 focus:border-terracotta focus:ring-2"
-          placeholder="Как к вам обращаться"
-        />
-        {errors.name ? (
-          <p className="mt-1 text-sm text-terracotta">{errors.name}</p>
-        ) : null}
-      </div>
+      <div className="grid gap-4 sm:grid-cols-2 sm:gap-4">
+        <div>
+          <label htmlFor="order-name" className={labelClass}>
+            Имя
+          </label>
+          <input
+            id="order-name"
+            name="name"
+            type="text"
+            autoComplete="name"
+            value={form.name}
+            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+            aria-invalid={Boolean(errors.name)}
+            aria-describedby={errors.name ? "order-name-error" : undefined}
+            className={`${fieldBase} ${errors.name ? fieldError : fieldOk}`}
+            placeholder="Как к вам обращаться"
+          />
+          {errors.name ? (
+            <p id="order-name-error" className={errorClass}>
+              {errors.name}
+            </p>
+          ) : null}
+        </div>
 
-      <div>
-        <label htmlFor="order-phone" className="block text-sm font-medium text-coffee">
-          Телефон
-        </label>
-        <input
-          id="order-phone"
-          name="phone"
-          type="tel"
-          autoComplete="tel"
-          value={form.phone}
-          onChange={(e) =>
-            setForm((f) => ({ ...f, phone: normalizePhone(e.target.value) }))
-          }
-          className="mt-1.5 w-full rounded-lg border border-coffee/15 bg-white px-4 py-2.5 text-coffee outline-none ring-terracotta/40 placeholder:text-coffee/40 focus:border-terracotta focus:ring-2"
-          placeholder="+375 29 XXX-XX-XX"
-        />
-        {errors.phone ? (
-          <p className="mt-1 text-sm text-terracotta">{errors.phone}</p>
-        ) : null}
+        <div>
+          <label htmlFor="order-phone" className={labelClass}>
+            Телефон
+          </label>
+          <input
+            id="order-phone"
+            name="phone"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            value={form.phone}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, phone: normalizePhone(e.target.value) }))
+            }
+            aria-invalid={Boolean(errors.phone)}
+            aria-describedby={errors.phone ? "order-phone-error" : undefined}
+            className={`${fieldBase} ${errors.phone ? fieldError : fieldOk}`}
+            placeholder="+375 29 XXX-XX-XX"
+          />
+          {errors.phone ? (
+            <p id="order-phone-error" className={errorClass}>
+              {errors.phone}
+            </p>
+          ) : null}
+        </div>
       </div>
 
       <fieldset>
-        <legend className="text-sm font-medium text-coffee">
-          Что интересует
-        </legend>
-        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-4">
+        <legend className={labelClass}>Что интересует</legend>
+        <div
+          className={`mt-1.5 flex overflow-hidden rounded-lg border bg-white ${
+            errors.interest ? "border-terracotta" : "border-coffee/25"
+          }`}
+        >
           {orderInterestOptions.map((opt) => (
             <label
               key={opt.value}
-              className="flex cursor-pointer items-center gap-2 text-coffee/90"
+              className="relative flex-1 cursor-pointer border-l border-coffee/20 first:border-l-0"
             >
               <input
                 type="radio"
@@ -226,28 +247,31 @@ export function OrderForm({
                 onChange={() =>
                   setForm((f) => ({ ...f, interest: opt.value }))
                 }
-                className="size-4 border-coffee/30 text-terracotta focus:ring-terracotta"
+                className="peer sr-only"
               />
-              {opt.label}
+              <span className="flex h-full items-center justify-center px-2 py-3 text-center text-[15px] font-medium leading-tight text-coffee transition-colors hover:bg-cream peer-checked:bg-coffee peer-checked:text-cream peer-focus-visible:ring-2 peer-focus-visible:ring-inset peer-focus-visible:ring-terracotta sm:py-2.5">
+                {opt.label}
+              </span>
             </label>
           ))}
         </div>
         {errors.interest ? (
-          <p className="mt-1 text-sm text-terracotta">{errors.interest}</p>
+          <p className={errorClass}>{errors.interest}</p>
         ) : null}
       </fieldset>
 
       <div>
-        <label htmlFor="order-comment" className="block text-sm font-medium text-coffee">
-          Комментарий
+        <label htmlFor="order-comment" className={labelClass}>
+          Комментарий{" "}
+          <span className="font-normal text-coffee-soft">(по желанию)</span>
         </label>
         <textarea
           id="order-comment"
           name="comment"
-          rows={4}
+          rows={3}
           value={form.comment}
           onChange={(e) => setForm((f) => ({ ...f, comment: e.target.value }))}
-          className="mt-1.5 w-full resize-y rounded-lg border border-coffee/15 bg-white px-4 py-2.5 text-coffee outline-none ring-terracotta/40 placeholder:text-coffee/40 focus:border-terracotta focus:ring-2"
+          className={`${fieldBase} ${fieldOk} resize-none`}
           placeholder="Сорта, количество, удобное время звонка"
         />
       </div>
@@ -255,7 +279,7 @@ export function OrderForm({
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full rounded-lg bg-terracotta px-6 py-3 text-sm font-semibold text-cream transition-colors hover:bg-terracotta-dark disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+        className="w-full rounded-lg bg-terracotta px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-terracotta-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coffee disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isSubmitting ? "Отправляем…" : "Отправить заявку"}
       </button>

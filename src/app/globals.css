@@ -13,18 +13,23 @@
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-coffee: var(--coffee);
-  --color-cream: var(--cream);
-  --color-terracotta: var(--terracotta);
-  --color-terracotta-dark: var(--terracotta-dark);
-  --color-olive: var(--olive);
-  --color-coffee-soft: var(--coffee-soft);
-  --color-coffee-deep: var(--coffee-deep);
-  --font-sans: var(--font-pt-sans);
-  --font-serif: var(--font-pt-serif);
+  --color-cream: #f4eadb;          /* крема: светлый фон секций */
+  --color-coffee: #2a1810;         /* обжаренное зерно: основной текст и тёмные блоки */
+  --color-coffee-soft: #5a4538;    /* второй уровень текста (контраст ≥ 7:1 на кремовом) */
+  --color-terracotta: #b3322a;     /* теперь «вишня кофе»: акцент и кнопки */
+  --color-terracotta-dark: #8e241d;/* акцент для текста на светлом фоне */
+  --color-olive: #43532b;          /* зелёный лист: второстепенный акцент */
+ 
+  --font-serif: var(--font-display);
+  --font-sans: var(--font-body);
 }
+ 
+body {
+  background: #ffffff;
+  color: var(--color-coffee);
+}
+ 
+
 
 .hero-surface,
 .section-dark {
@@ -81,3 +86,4 @@ body {
     transform: translateX(0);
   }
 }
+
