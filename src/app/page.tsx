@@ -1,3 +1,5 @@
+import { HeroCarousel } from "@/components/HeroCarusel";
+import { HeroSection } from "@/components/HeroSection";
 import { LandingHeader } from "@/components/LandingHeader";
 import { OrderCtaButton } from "@/components/OrderCtaButton";
 import { RoastingCarousel } from "@/components/RoastingCarousel";
@@ -21,59 +23,35 @@ export default function Home() {
       <LandingHeader />
 
       <main>
-        <section className="border-b border-coffee/10 bg-cream px-4 py-16 sm:px-6 sm:py-24">
-          <div className="mx-auto max-w-5xl">
-            <p className="text-sm font-medium uppercase tracking-widest text-olive">
-              Ремесленная обжарка · Минск
-            </p>
-            <h1 className="mt-4 max-w-2xl font-serif text-4xl leading-tight text-coffee sm:text-5xl">
-              Свежий кофе: обжариваем по четвергам, отправляем свежим
-            </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-coffee/80">
-              Небольшие партии по 5&nbsp;кг, зерно на 1–3 день после обжарки.
-              Закажите пачку или подписку — доставим в пятницу или заберите на
-              ул.&nbsp;Короля.
-            </p>
-            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-              <OrderCtaButton interest="one-time">
-                Заказать кофе
-              </OrderCtaButton>
-              <OrderCtaButton interest="subscription" variant="secondary">
-                Оформить подписку
-              </OrderCtaButton>
-              <a
-                href="#assortment"
-                className="inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium text-coffee/80 underline-offset-4 transition-colors hover:text-coffee hover:underline"
-              >
-                Смотреть ассортимент
-              </a>
-            </div>
-          </div>
-        </section>
+        {/* <HeroSection />
 
-        <RoastingCarousel />
+        <RoastingCarousel /> */}
+        <HeroCarousel />
 
         <section
           id="about"
-          className="border-b border-coffee/10 bg-white px-4 py-16 sm:px-6 sm:py-20"
+          className="section-surface-white px-4 py-14 sm:px-6 sm:py-16 lg:py-20"
         >
-          <div className="mx-auto grid max-w-5xl gap-10 lg:grid-cols-2 lg:gap-16">
+          <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-2 lg:gap-14">
             <div>
-              <h2 className="font-serif text-3xl text-coffee">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-olive">
+                О нас
+              </p>
+              <h2 className="mt-3 font-serif text-3xl text-coffee sm:text-4xl">
                 Кто мы и почему свежесть важна
               </h2>
-              <p className="mt-6 leading-relaxed text-coffee/85">
+              <p className="mt-6 leading-relaxed text-coffee-soft">
                 Нас зовут {company.founders} — {company.foundersBio}
               </p>
-              <p className="mt-4 leading-relaxed text-coffee/85">
+              <p className="mt-4 leading-relaxed text-coffee-soft">
                 {company.freshnessNote} Мы не копим склад: каждая партия уходит
                 к вам вскоре после обжарки, пока аромат ещё живой.
               </p>
             </div>
-            <div className="rounded-2xl border border-coffee/10 bg-cream p-6 sm:p-8">
+            <div className="rounded-2xl border border-coffee/12 bg-cream p-6 shadow-sm sm:p-8">
               <h3 className="font-serif text-xl text-coffee">Самовывоз</h3>
               <p className="mt-3 text-lg text-coffee">{pickup.fullAddress}</p>
-              <dl className="mt-6 space-y-2 text-sm text-coffee/80">
+              <dl className="mt-6 space-y-2 text-sm text-coffee-soft">
                 <div className="flex justify-between gap-4 border-b border-coffee/10 pb-2">
                   <dt>Будни</dt>
                   <dd className="font-medium text-coffee">{pickup.hoursWeekdays}</dd>
@@ -89,28 +67,31 @@ export default function Home() {
 
         <section
           id="assortment"
-          className="border-b border-coffee/10 bg-cream px-4 py-16 sm:px-6 sm:py-20"
+          className="section-surface-cream px-4 py-14 sm:px-6 sm:py-16 lg:py-20"
         >
-          <div className="mx-auto max-w-5xl">
-            <h2 className="font-serif text-3xl text-coffee">
+          <div className="mx-auto max-w-6xl">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-olive">
+              Магазин
+            </p>
+            <h2 className="mt-3 font-serif text-3xl text-coffee sm:text-4xl">
               Ассортимент и подписка
             </h2>
-            <p className="mt-3 max-w-2xl text-coffee/75">
+            <p className="mt-3 max-w-2xl text-coffee-soft">
               Три origin-сорта в пачках по 250&nbsp;г, дрип-пакеты для дома и
               офиса и месячная подписка с бесплатной доставкой.
             </p>
 
-            <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {coffeeOrigins.map((item) => (
                 <li
                   key={item.id}
-                  className="flex flex-col rounded-2xl border border-coffee/10 bg-white p-6 shadow-sm"
+                  className="flex flex-col rounded-2xl border border-coffee/12 bg-white p-6 shadow-sm"
                 >
                   <h3 className="font-serif text-xl text-coffee">{item.name}</h3>
-                  <p className="mt-2 flex-1 text-sm leading-relaxed text-coffee/75">
+                  <p className="mt-2 flex-1 text-sm leading-relaxed text-coffee-soft">
                     {item.notes}
                   </p>
-                  <p className="mt-4 text-sm text-olive">
+                  <p className="mt-4 text-sm font-medium text-olive">
                     {item.weightGrams} г
                   </p>
                   <p className="mt-1 text-lg font-semibold text-coffee">
@@ -128,15 +109,15 @@ export default function Home() {
               ))}
             </ul>
 
-            <div className="mt-6 grid gap-6 sm:grid-cols-2">
-              <article className="flex flex-col rounded-2xl border border-olive/25 bg-white p-6 shadow-sm">
+            <div className="mt-6 grid gap-5 sm:grid-cols-2">
+              <article className="flex flex-col rounded-2xl border border-olive/30 bg-white p-6 shadow-sm">
                 <span className="text-xs font-medium uppercase tracking-wide text-olive">
                   Дрип-пакеты
                 </span>
                 <h3 className="mt-2 font-serif text-xl text-coffee">
                   {dripPack.name}
                 </h3>
-                <p className="mt-2 flex-1 text-sm text-coffee/75">
+                <p className="mt-2 flex-1 text-sm text-coffee-soft">
                   {dripPack.quantity} штук — удобно попробовать разные профили
                 </p>
                 <p className="mt-4 text-lg font-semibold text-coffee">
@@ -152,19 +133,19 @@ export default function Home() {
                 </OrderCtaButton>
               </article>
 
-              <article className="flex flex-col rounded-2xl border-2 border-terracotta/40 bg-white p-6 shadow-sm">
+              <article className="flex flex-col rounded-2xl border-2 border-terracotta/45 bg-white p-6 shadow-md">
                 <span className="text-xs font-medium uppercase tracking-wide text-terracotta">
                   Подписка
                 </span>
                 <h3 className="mt-2 font-serif text-xl text-coffee">
                   Кофе каждый месяц
                 </h3>
-                <p className="mt-2 flex-1 text-sm leading-relaxed text-coffee/75">
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-coffee-soft">
                   {subscription.description}
                 </p>
                 <p className="mt-4 text-lg font-semibold text-coffee">
                   {formatPrice(subscription.priceBynPerMonth)}{" "}
-                  <span className="text-sm font-normal text-coffee/60">/ мес</span>
+                  <span className="text-sm font-normal text-coffee-soft">/ мес</span>
                 </p>
                 <OrderCtaButton
                   interest="subscription"
@@ -180,16 +161,19 @@ export default function Home() {
 
         <section
           id="delivery"
-          className="border-b border-coffee/10 bg-white px-4 py-16 sm:px-6 sm:py-20"
+          className="section-surface-white px-4 py-14 sm:px-6 sm:py-16 lg:py-20"
         >
-          <div className="mx-auto max-w-5xl">
-            <h2 className="font-serif text-3xl text-coffee">
+          <div className="mx-auto max-w-6xl">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-olive">
+              Логистика
+            </p>
+            <h2 className="mt-3 font-serif text-3xl text-coffee sm:text-4xl">
               Доставка и самовывоз
             </h2>
-            <div className="mt-10 grid gap-8 sm:grid-cols-2">
-              <div className="rounded-2xl bg-cream p-6 sm:p-8">
+            <div className="mt-10 grid gap-6 sm:grid-cols-2">
+              <div className="rounded-2xl border border-coffee/10 bg-cream p-6 sm:p-8">
                 <h3 className="font-serif text-xl text-coffee">Доставка</h3>
-                <ul className="mt-4 space-y-3 text-coffee/85">
+                <ul className="mt-4 space-y-3 text-coffee-soft">
                   <li className="flex gap-2">
                     <span className="text-terracotta" aria-hidden>
                       ·
@@ -211,13 +195,13 @@ export default function Home() {
                   </li>
                 </ul>
               </div>
-              <div className="rounded-2xl bg-cream p-6 sm:p-8">
+              <div className="rounded-2xl border border-coffee/10 bg-cream p-6 sm:p-8">
                 <h3 className="font-serif text-xl text-coffee">Самовывоз</h3>
-                <p className="mt-4 text-coffee/85">{pickup.fullAddress}</p>
-                <p className="mt-3 text-sm text-coffee/70">
+                <p className="mt-4 text-coffee-soft">{pickup.fullAddress}</p>
+                <p className="mt-3 text-sm text-coffee-soft">
                   {pickup.hoursWeekdays}, {pickup.hoursWeekend}
                 </p>
-                <p className="mt-4 text-sm text-coffee/75">
+                <p className="mt-4 text-sm text-coffee-soft">
                   Заберите заказ в удобное время — напишите в комментарии к
                   заявке.
                 </p>
@@ -227,16 +211,16 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-coffee/10 bg-coffee text-cream">
-        <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+      <footer className="border-t border-cream/10 bg-coffee text-cream">
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
           <div className="flex flex-col gap-8 sm:flex-row sm:justify-between">
             <div>
               <p className="font-serif text-2xl">Кварта</p>
-              <p className="mt-2 text-sm text-cream/75">
+              <p className="mt-2 text-sm text-cream/80">
                 Ремесленная обжарка с {company.sinceYear} года
               </p>
             </div>
-            <div className="text-sm text-cream/85">
+            <div className="text-sm text-cream/90">
               <p className="font-medium">{pickup.fullAddress}</p>
               <p className="mt-2">{pickup.hoursWeekdays}</p>
               <p>{pickup.hoursWeekend}</p>
