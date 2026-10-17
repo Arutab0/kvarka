@@ -10,6 +10,11 @@ export type LeadUtm = {
   content?: string;
   term?: string;
   referrer?: string;
+  page?: string;
+  landing?: string;
+  gclid?: string;
+  yclid?: string;
+  fbclid?: string;
 };
 
 export type StoredLead = {

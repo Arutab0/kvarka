@@ -1,18 +1,21 @@
 import { validateBelarusPhone } from "@/lib/belarus-phone";
 import {
-  checkDuplicateSubmission,
   releaseSubmissionSlot,
   reserveSubmissionSlot,
 } from "@/lib/lead-dedupe";
 import {
-  appendLead,
   type LeadType,
   type LeadUtm,
   type StoredLead,
 } from "@/lib/leads-file";
+import { saveLead } from "@/lib/leads-store";
 import { notifyTelegramLead } from "@/lib/telegram-lead";
 
 const LEAD_TYPES = new Set<LeadType>(["subscription", "order", "question"]);
+
+const MAX_NAME = 100;
+const MAX_COMMENT = 1000;
+const MAX_ATTR = 500;
 
 type LeadRequestBody = {
   name?: unknown;
@@ -22,24 +25,31 @@ type LeadRequestBody = {
   utm?: unknown;
 };
 
+// Тип LeadUtm в lib/leads-file.ts нужно расширить теми же ключами.
+const UTM_KEYS = [
+  "source",
+  "medium",
+  "campaign",
+  "content",
+  "term",
+  "referrer",
+  "page",
+  "landing",
+  "gclid",
+  "yclid",
+  "fbclid",
+] as const;
+
 function parseUtm(value: unknown): LeadUtm | undefined {
   if (!value || typeof value !== "object") {
     return undefined;
   }
   const raw = value as Record<string, unknown>;
   const utm: LeadUtm = {};
-  const keys = [
-    "source",
-    "medium",
-    "campaign",
-    "content",
-    "term",
-    "referrer",
-  ] as const;
-  for (const key of keys) {
+  for (const key of UTM_KEYS) {
     const v = raw[key];
     if (typeof v === "string" && v.trim()) {
-      utm[key] = v.trim();
+      utm[key] = v.trim().slice(0, MAX_ATTR);
     }
   }
   return Object.keys(utm).length > 0 ? utm : undefined;
@@ -57,7 +67,8 @@ export async function POST(request: Request): Promise<Response> {
     return jsonResponse({ error: "Некорректный JSON в теле запроса" }, 400);
   }
 
-  const name = typeof body.name === "string" ? body.name.trim() : "";
+  const name =
+    typeof body.name === "string" ? body.name.trim().slice(0, MAX_NAME) : "";
   if (!name) {
     return jsonResponse({ error: "Укажите имя" }, 400);
   }
@@ -78,13 +89,15 @@ export async function POST(request: Request): Promise<Response> {
 
   const comment =
     typeof body.comment === "string" && body.comment.trim()
-      ? body.comment.trim()
+      ? body.comment.trim().slice(0, MAX_COMMENT)
       : undefined;
 
   const utm = parseUtm(body.utm);
   const phoneKey = phoneResult.digitsKey;
 
-  if (checkDuplicateSubmission(phoneKey)) {
+  // Атомарная проверка и резервирование: false — такой номер уже подавал заявку
+  const reserved = await reserveSubmissionSlot(phoneKey);
+  if (!reserved) {
     return jsonResponse(
       {
         error:
@@ -93,8 +106,6 @@ export async function POST(request: Request): Promise<Response> {
       429,
     );
   }
-
-  reserveSubmissionSlot(phoneKey);
 
   const lead: StoredLead = {
     timestamp: new Date().toISOString(),
@@ -106,9 +117,10 @@ export async function POST(request: Request): Promise<Response> {
   };
 
   try {
-    await appendLead(lead);
-  } catch {
-    releaseSubmissionSlot(phoneKey);
+    await saveLead(lead);
+  } catch (error) {
+    console.error("Saving lead failed:", error);
+    await releaseSubmissionSlot(phoneKey);
     return jsonResponse(
       { error: "Не удалось сохранить заявку. Попробуйте позже." },
       500,

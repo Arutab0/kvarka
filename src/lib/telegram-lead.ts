@@ -1,69 +1,50 @@
-import type { LeadType, LeadUtm, StoredLead } from "@/lib/leads-file";
+import type { StoredLead } from "@/lib/leads-file";
 
-const TYPE_LABELS: Record<LeadType, string> = {
+const esc = (s: string) =>
+  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+const typeLabel: Record<string, string> = {
   subscription: "Подписка",
   order: "Разовый заказ",
   question: "Вопрос",
 };
 
-function escapeMarkdown(text: string): string {
-  return text.replace(/([_*`\[])/g, "\\$1");
-}
-
-function formatUtmBlock(utm?: LeadUtm): string {
-  if (!utm) {
-    return "";
-  }
-  const lines: string[] = [];
-  if (utm.source) lines.push(`source: ${utm.source}`);
-  if (utm.medium) lines.push(`medium: ${utm.medium}`);
-  if (utm.campaign) lines.push(`campaign: ${utm.campaign}`);
-  if (utm.content) lines.push(`content: ${utm.content}`);
-  if (utm.term) lines.push(`term: ${utm.term}`);
-  if (utm.referrer) lines.push(`referrer: ${utm.referrer}`);
-  if (lines.length === 0) {
-    return "";
-  }
-  return `\n\n*UTM*\n${lines.map((l) => escapeMarkdown(l)).join("\n")}`;
-}
-
+/** Бросает исключение при сбое — route.ts его ловит и пишет в лог,
+ *  заявка при этом уже сохранена. Без токена тихо ничего не делает. */
 export async function notifyTelegramLead(lead: StoredLead): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
-  if (!token || !chatId) {
-    return;
-  }
+  if (!token || !chatId) return;
 
-  const commentBlock = lead.comment?.trim()
-    ? `\n\n*Комментарий*\n${escapeMarkdown(lead.comment.trim())}`
+  const utm = lead.utm
+    ? Object.entries(lead.utm)
+        .filter(([, v]) => v)
+        .map(([k, v]) => `${esc(k)}: ${esc(String(v))}`)
+        .join("\n")
     : "";
 
   const text = [
-    "*Новая заявка · Кварта*",
-    "",
-    `*Имя:* ${escapeMarkdown(lead.name)}`,
-    `*Телефон:* ${escapeMarkdown(lead.phone)}`,
-    `*Тип:* ${escapeMarkdown(TYPE_LABELS[lead.type])}`,
-    `*Время:* ${escapeMarkdown(lead.timestamp)}`,
-    commentBlock,
-    formatUtmBlock(lead.utm),
+    `<b>Новая заявка: ${esc(typeLabel[lead.type] ?? lead.type)}</b>`,
+    `Имя: ${esc(lead.name)}`,
+    `Телефон: ${esc(lead.phone)}`,
+    lead.comment ? `Комментарий: ${esc(lead.comment)}` : "",
+    utm ? `\n<b>Источник</b>\n${utm}` : "\nИсточник: прямой заход",
   ]
     .filter(Boolean)
     .join("\n");
 
-  const url = `https://api.telegram.org/bot${token}/sendMessage`;
-  const response = await fetch(url, {
+  const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       chat_id: chatId,
       text,
-      parse_mode: "Markdown",
+      parse_mode: "HTML",
+      disable_web_page_preview: true,
     }),
+    signal: AbortSignal.timeout(5000),
   });
-
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Telegram API ${response.status}: ${body}`);
+  if (!res.ok) {
+    throw new Error(`Telegram responded ${res.status}`);
   }
 }
