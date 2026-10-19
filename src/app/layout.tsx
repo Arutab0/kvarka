@@ -15,9 +15,18 @@ const ptSerif = PT_Serif({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://kvarka.vercel.app"), 
   title: "Кварта — обжарка кофе в Минске",
   description:
     "Небольшая ремесленная обжарка: свежее зерно, обжарка по четвергам, доставка и самовывоз на ул. Короля, 9.",
+  openGraph: {
+    title: "Кварта — свежий кофе из Минска",
+    description: "Обжариваем по четвергам, привозим по пятницам. Кофе у вас на 1–3 день после обжарки.",
+    siteName: "Кварта",
+    locale: "ru_RU",
+    type: "website",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
